@@ -32,16 +32,16 @@ const Conversation = ({ isMobile, menu }) => {
   useEffect(() => {
     const current = conversations.find((el) => el?.id === room_id);
 
-   setTimeout(()=>{
+  //  setTimeout(()=>{
     socket.emit("get_messages", { conversation_id: current?.id }, (data) => {
       // data => list of messages
       console.log(data, "List of messages");
       dispatch(FetchCurrentMessages({ messages: data }));
     });
-   },2000)
+  //  },2000)
 
     dispatch(SetCurrentConversation(current));
-  }, []);
+  }, [conversations,current_messages]);
   return (
     <Box p={isMobile ? 1 : 3}>
       <Stack spacing={3}>

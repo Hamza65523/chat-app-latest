@@ -18,13 +18,14 @@ import {
   User,
 } from "phosphor-react";
 import { useTheme, styled } from "@mui/material/styles";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useResponsive from "../../hooks/useResponsive";
 
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { socket } from "../../socket";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { FetchDirectConversations } from "../../redux/slices/conversation";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -191,6 +192,14 @@ const Footer = () => {
       input.selectionStart = input.selectionEnd = selectionStart + 1;
     }
   }
+  const dispatch= useDispatch()
+  const [check,setCheck]=useState(0)
+  useEffect(() => {
+     socket.emit("get_direct_conversations", { user_id }, (data) => {
+       // dispatch action
+       dispatch(FetchDirectConversations({ conversations: data }));
+     });
+   }, [check]);
 console.log(room_id,'room_idroom_idroom_idroom_id',current_conversation)
   return (
     <Box
@@ -253,6 +262,8 @@ console.log(room_id,'room_idroom_idroom_idroom_id',current_conversation)
             >
               <IconButton
                 onClick={() => {
+                  setCheck(check+1)
+                  setValue('')
                   socket.emit("text_message", {
                     message: linkify(value),
                     conversation_id: room_id ||'6554d841e9ba35a3989dbb89',

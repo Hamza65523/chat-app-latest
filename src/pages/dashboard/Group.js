@@ -38,37 +38,51 @@ const Group = () => {
 const GroupChat = () => {
   const userId = window.localStorage.getItem("user_id");
 
-  const groupId  =
-   useSearchParams('groupId');
+  const groupId ='wgwu4as';
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  
-  useEffect(() => {
-    // Set up event listeners for socket.io
-    
-    if (socket) {
-      socket.emit('createGroup', 'name','picname');
-      // Receive new messages
-      socket.on('new_group_message', (data) => {
-        setMessages((prevMessages) => [...prevMessages, data.message]);
-      });
-
-      // Connect to the group on component mount
-      socket.emit('joinGroup', groupId,userId);
-
-      // Clean up event listeners on component unmount
-      return () => {
-        socket.off('new_group_message');
-      };
-    }
-  }, [socket, groupId]);
-
   const sendMessage = () => {
     if (socket && inputMessage.trim() !== '') {
       socket.emit('sendMessage', groupId, inputMessage, null, userId);
       setInputMessage('');
     }
   };
+  useEffect(() => {
+    // Set up event listeners for socket.io
+    
+    if (socket) {
+      // socket.emit('createGroup', 'name','picname');
+      // Receive new messages
+     
+      socket.on('receiveMessage', (data) => {
+        console.log(data,'receiveMessage')
+        setMessages((prevMessages) => [...prevMessages, data]);
+      });
+     
+      // Connect to the group on component mount
+      // socket.emit('joinGroup', groupId,userId);
+
+      // Clean up event listeners on component unmount
+      return () => {
+        socket.off('new_group_message');
+      };
+    }
+
+  }, [socket, groupId]);
+useEffect(()=>{
+   
+  if (socket) {
+    socket.on('new_group_message', (data) => {
+      console.log(data,'new_group_message')
+      setMessages((prevMessages) => [...prevMessages, data.message]);
+    });
+  socket.emit("get_group_messages", { groupId }, (data) => {
+    // data => list of messages
+    console.log(data, "List of messages");
+    setMessages((prevMessages) => [...prevMessages,   ...data ]);
+  });
+  }
+},[socket])
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
@@ -76,7 +90,7 @@ const GroupChat = () => {
         <List>
           {messages.map((message, index) => (
             <ListItem key={index}>
-              <ListItemText primary={message.text} secondary={message.userId} />
+              <ListItemText primary={message.text} secondary={message.username} />
             </ListItem>
           ))}
         </List>

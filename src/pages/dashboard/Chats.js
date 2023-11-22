@@ -39,16 +39,17 @@ const Chats = () => {
 
   const {conversations} = useSelector((state) => state.conversation.direct_chat);
 
+ 
   useEffect(() => {
-   setTimeout(() => {
+  //  setTimeout(() => {
     socket.emit("get_direct_conversations", { user_id }, (data) => {
-      console.log(data); // this data is the list of conversations
       // dispatch action
 
       dispatch(FetchDirectConversations({ conversations: data }));
     });
-   }, 2000);
+  //  }, 2000);
   }, []);
+
 
   const [openDialog, setOpenDialog] = useState(false);
 
